@@ -1,0 +1,54 @@
+name: Test AI Services
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ai-services/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'ai-services/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        cd ai-services
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+
+    - name: Run linting
+      run: |
+        cd ai-services
+        flake8 .
+        black --check .
+        isort --check-only .
+
+    - name: Run tests
+      run: |
+        cd ai-services
+        pytest --cov=./ --cov-report=xml
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./ai-services/coverage.xml
+        flags: ai-services
+        name: codecov-ai
+        fail_ci_if_error: true 

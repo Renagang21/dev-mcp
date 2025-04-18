@@ -1,0 +1,81 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**'
+      - '!.github/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test-pharmacy, test-o4o, test-ai, test-app, test-wordpress]
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push pharmacy-automation image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: pharmacy-automation
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./pharmacy-automation
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Build, tag, and push o4o-platform image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: o4o-platform
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./o4o-platform
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Build, tag, and push ai-services image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ai-services
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./ai-services
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Build, tag, and push app image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: app
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Build, tag, and push wordpress image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: wordpress
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./wordpress
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Update Kubernetes deployments
+      run: |
+        aws eks update-kubeconfig --name mcp-cluster --region ap-northeast-2
+        kubectl set image deployment/pharmacy-automation pharmacy-automation=$ECR_REGISTRY/pharmacy-automation:$IMAGE_TAG
+        kubectl set image deployment/o4o-platform o4o-platform=$ECR_REGISTRY/o4o-platform:$IMAGE_TAG
+        kubectl set image deployment/ai-services ai-services=$ECR_REGISTRY/ai-services:$IMAGE_TAG
+        kubectl set image deployment/app app=$ECR_REGISTRY/app:$IMAGE_TAG
+        kubectl set image deployment/wordpress wordpress=$ECR_REGISTRY/wordpress:$IMAGE_TAG 

@@ -1,0 +1,81 @@
+# Pharmacy Automation 관련 변경사항
+pharmacy-automation:
+  - pharmacy-automation/**/*
+  - !pharmacy-automation/node_modules/**
+  - !pharmacy-automation/dist/**
+  - !pharmacy-automation/build/**
+
+# O4O Platform 관련 변경사항
+o4o-platform:
+  - o4o-platform/**/*
+  - !o4o-platform/node_modules/**
+  - !o4o-platform/dist/**
+  - !o4o-platform/build/**
+
+# AI Services 관련 변경사항
+ai-services:
+  - ai-services/**/*
+  - !ai-services/node_modules/**
+  - !ai-services/dist/**
+  - !ai-services/build/**
+
+# App 관련 변경사항
+app:
+  - app/**/*
+  - !app/node_modules/**
+  - !app/dist/**
+  - !app/build/**
+
+# WordPress 관련 변경사항
+wordpress:
+  - wordpress/**/*
+  - !wordpress/node_modules/**
+  - !wordpress/dist/**
+  - !wordpress/build/**
+
+# 문서 관련 변경사항
+documentation:
+  - docs/**/*
+  - README.md
+  - CONTRIBUTING.md
+  - CHANGELOG.md
+
+# 테스트 관련 변경사항
+test:
+  - **/tests/**/*
+  - **/__tests__/**/*
+  - **/*.test.*
+  - **/*.spec.*
+  - **/jest.config.*
+  - **/cypress.config.*
+  - **/test-setup.*
+
+# 설정 관련 변경사항
+config:
+  - **/config/**/*
+  - **/.env*
+  - **/package.json
+  - **/package-lock.json
+  - **/yarn.lock
+  - **/tsconfig.json
+  - **/webpack.config.*
+  - **/babel.config.*
+  - **/.eslintrc.*
+  - **/.prettierrc.*
+  - **/.github/workflows/*.yml
+
+# 의존성 관련 변경사항
+dependencies:
+  - **/package.json
+  - **/package-lock.json
+  - **/yarn.lock
+  - **/requirements.txt
+  - **/Pipfile
+  - **/Pipfile.lock
+
+# CI/CD 관련 변경사항
+ci:
+  - .github/workflows/**/*
+  - .github/actions/**/*
+  - .github/labeler.yml
+  - .github/dependabot.yml 

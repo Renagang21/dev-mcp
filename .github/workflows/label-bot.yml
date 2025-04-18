@@ -1,58 +1,52 @@
 name: Label Bot
 
 on:
-  issues:
-    types: [opened, edited, milestoned]
   pull_request:
+    types: [opened, synchronize, reopened]
+  issues:
     types: [opened, edited, milestoned]
 
 jobs:
   label:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
     steps:
-      - name: Label Bot
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Label PR
+        uses: actions/labeler@v4
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/labeler.yml
+
+      - name: Add Type Label
         uses: actions/github-script@v6
         with:
           script: |
-            const context = github.context;
-            const issue = context.issue;
+            const title = context.payload.pull_request?.title || context.payload.issue?.title;
+            const body = context.payload.pull_request?.body || context.payload.issue?.body;
+            const content = `${title}\n${body}`.toLowerCase();
             
-            // PR 또는 이슈의 제목과 내용을 분석하여 라벨 결정
-            const title = context.payload.issue?.title || context.payload.pull_request?.title;
-            const body = context.payload.issue?.body || context.payload.pull_request?.body;
+            let typeLabel = '';
             
-            let labels = [];
-            
-            // 버그 관련 키워드
-            if (title.toLowerCase().includes('bug') || 
-                title.toLowerCase().includes('fix') || 
-                body.toLowerCase().includes('bug') || 
-                body.toLowerCase().includes('fix')) {
-              labels.push('bug');
+            if (content.includes('bug') || content.includes('fix')) {
+              typeLabel = 'bug';
+            } else if (content.includes('feat') || content.includes('feature')) {
+              typeLabel = 'enhancement';
+            } else if (content.includes('doc') || content.includes('docs')) {
+              typeLabel = 'documentation';
+            } else if (content.includes('refactor')) {
+              typeLabel = 'refactor';
             }
             
-            // 기능 추가 관련 키워드
-            if (title.toLowerCase().includes('feat') || 
-                title.toLowerCase().includes('feature') || 
-                body.toLowerCase().includes('feat') || 
-                body.toLowerCase().includes('feature')) {
-              labels.push('enhancement');
-            }
-            
-            // 문서 관련 키워드
-            if (title.toLowerCase().includes('doc') || 
-                title.toLowerCase().includes('docs') || 
-                body.toLowerCase().includes('doc') || 
-                body.toLowerCase().includes('docs')) {
-              labels.push('documentation');
-            }
-            
-            // 라벨이 있으면 추가
-            if (labels.length > 0) {
-              github.rest.issues.addLabels({
-                owner: issue.owner,
-                repo: issue.repo,
-                issue_number: issue.number,
-                labels: labels
+            if (typeLabel) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: [typeLabel]
               });
             } 

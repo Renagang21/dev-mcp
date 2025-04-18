@@ -1,0 +1,172 @@
+{
+    "editor": {
+        "fontSize": 14,
+        "fontFamily": "JetBrains Mono, Consolas, 'Courier New', monospace",
+        "lineHeight": 1.6,
+        "tabSize": 2,
+        "insertSpaces": true,
+        "wordWrap": "on",
+        "formatOnSave": true,
+        "formatOnPaste": true,
+        "minimap": {
+            "enabled": true,
+            "scale": 1,
+            "renderCharacters": false
+        },
+        "suggest": {
+            "preview": true,
+            "showMethods": true,
+            "showFunctions": true,
+            "showConstructors": true,
+            "showFields": true,
+            "showVariables": true,
+            "showClasses": true,
+            "showStructs": true,
+            "showInterfaces": true,
+            "showModules": true,
+            "showProperties": true,
+            "showEvents": true,
+            "showOperators": true,
+            "showUnits": true,
+            "showValues": true,
+            "showConstants": true,
+            "showEnums": true,
+            "showEnumMembers": true,
+            "showKeywords": true,
+            "showWords": true,
+            "showColors": true,
+            "showFiles": true,
+            "showReferences": true,
+            "showFolders": true,
+            "showTypeParameters": true,
+            "showSnippets": true
+        }
+    },
+    "files": {
+        "exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/node_modules": true,
+            "**/dist": true,
+            "**/build": true,
+            "**/.next": true,
+            "**/coverage": true,
+            "**/.env*": true,
+            "**/.vscode": true,
+            "**/.idea": true
+        },
+        "associations": {
+            "*.md": "markdown",
+            "*.mdx": "markdown",
+            "*.json": "json",
+            "*.yml": "yaml",
+            "*.yaml": "yaml",
+            "*.ts": "typescript",
+            "*.tsx": "typescriptreact",
+            "*.js": "javascript",
+            "*.jsx": "javascriptreact",
+            "*.py": "python",
+            "*.php": "php"
+        },
+        "autoSave": "afterDelay",
+        "autoSaveDelay": 1000
+    },
+    "terminal": {
+        "integrated": {
+            "shell": {
+                "windows": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "linux": "/bin/bash",
+                "osx": "/bin/zsh"
+            },
+            "fontFamily": "JetBrains Mono",
+            "fontSize": 14,
+            "lineHeight": 1.6
+        }
+    },
+    "git": {
+        "enabled": true,
+        "autofetch": true,
+        "confirmSync": false,
+        "enableSmartCommit": true,
+        "autorefresh": true,
+        "decorations": {
+            "enabled": true,
+            "colors": true
+        }
+    },
+    "workbench": {
+        "colorTheme": "Default Dark+",
+        "iconTheme": "vs-seti",
+        "startupEditor": "welcomePage",
+        "activityBar": {
+            "visible": true,
+            "location": "left"
+        },
+        "sideBar": {
+            "location": "left",
+            "visible": true
+        },
+        "statusBar": {
+            "visible": true
+        },
+        "editorGroups": {
+            "layout": "vertical"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "dbaeumer.vscode-eslint",
+            "esbenp.prettier-vscode",
+            "streetsidesoftware.code-spell-checker",
+            "eamodio.gitlens",
+            "ms-vscode.vscode-typescript-tslint-plugin",
+            "christian-kohler.path-intellisense",
+            "mikestead.dotenv",
+            "redhat.vscode-yaml",
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "ms-azuretools.vscode-docker",
+            "ms-kubernetes-tools.vscode-kubernetes-tools",
+            "ms-vscode-remote.remote-containers",
+            "ms-vscode-remote.remote-ssh",
+            "ms-vscode-remote.remote-wsl",
+            "ms-vscode.powershell",
+            "ms-vscode.cpptools",
+            "ms-vscode.cmake-tools",
+            "ms-vscode.makefile-tools",
+            "ms-vscode.test-adapter-converter",
+            "ms-vscode.test-explorer",
+            "ms-vscode.vscode-github-issue-notebooks",
+            "ms-vscode.vscode-markdown-notebook",
+            "ms-vscode.vscode-js-profile-flame",
+            "ms-vscode.vscode-js-profile-table",
+            "ms-vscode.vscode-node-azure-pack",
+            "ms-vscode.vscode-typescript-next",
+            "ms-vscode.vscode-typescript-tslint-plugin",
+            "ms-vscode.vscode-js-profile-flame",
+            "ms-vscode.vscode-js-profile-table"
+        ]
+    },
+    "cursor": {
+        "ai": {
+            "enabled": true,
+            "model": "claude-3-opus-20240229",
+            "maxTokens": 4000,
+            "temperature": 0.7,
+            "topP": 1.0,
+            "frequencyPenalty": 0.0,
+            "presencePenalty": 0.0
+        },
+        "snippets": {
+            "enabled": true,
+            "path": "./cursor/snippets"
+        },
+        "rules": {
+            "enabled": true,
+            "path": "./cursor/cursorrules-templates"
+        }
+    }
+}

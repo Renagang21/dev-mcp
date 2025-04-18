@@ -1,0 +1,51 @@
+name: Test Pharmacy Automation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'pharmacy-automation/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'pharmacy-automation/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        cd pharmacy-automation
+        npm ci
+
+    - name: Run linting
+      run: |
+        cd pharmacy-automation
+        npm run lint
+
+    - name: Run tests
+      run: |
+        cd pharmacy-automation
+        npm test
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./pharmacy-automation/coverage/lcov.info
+        flags: pharmacy-automation
+        name: codecov-pharmacy
+        fail_ci_if_error: true 

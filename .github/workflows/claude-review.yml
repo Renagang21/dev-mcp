@@ -21,14 +21,95 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install anthropic python-dotenv
 
       - name: Run Claude Review
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
         run: |
-          python scripts/claude_review.py
+          python << 'EOF'
+          import os
+          import anthropic
+          from dotenv import load_dotenv
+          import json
+          import subprocess
+
+          # 환경 변수 로드
+          load_dotenv()
+          GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+          CLAUDE_API_KEY = os.getenv('CLAUDE_API_KEY')
+
+          # PR 정보 가져오기
+          pr_info = subprocess.run(
+              ['gh', 'pr', 'view', '--json', 'title,body,number,baseRefName,headRefName'],
+              capture_output=True,
+              text=True
+          ).stdout
+          pr_data = json.loads(pr_info)
+
+          # 변경된 파일 목록 가져오기
+          changed_files = subprocess.run(
+              ['git', 'diff', '--name-only', f'origin/{pr_data["baseRefName"]}...origin/{pr_data["headRefName"]}'],
+              capture_output=True,
+              text=True
+          ).stdout.splitlines()
+
+          # 각 파일의 변경사항 가져오기
+          changes = []
+          for file in changed_files:
+              diff = subprocess.run(
+                  ['git', 'diff', f'origin/{pr_data["baseRefName"]}...origin/{pr_data["headRefName"]}', '--', file],
+                  capture_output=True,
+                  text=True
+              ).stdout
+              changes.append(f"File: {file}\n{diff}")
+
+          # Claude에 리뷰 요청
+          client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
+          
+          prompt = f"""
+          Please review this pull request:
+
+          Title: {pr_data['title']}
+          Description: {pr_data['body']}
+
+          Changes:
+          {chr(10).join(changes)}
+
+          Please provide a detailed code review focusing on:
+          1. Code quality and best practices
+          2. Potential bugs or issues
+          3. Security concerns
+          4. Performance implications
+          5. Test coverage
+          6. Documentation
+          7. Suggested improvements
+
+          Format your review as markdown.
+          """
+
+          response = client.messages.create(
+              model="claude-3-opus-20240229",
+              max_tokens=4000,
+              messages=[
+                  {
+                      "role": "user",
+                      "content": prompt
+                  }
+              ]
+          )
+
+          # 리뷰 결과를 파일로 저장
+          with open('review.md', 'w') as f:
+              f.write(response.content[0].text)
+
+          # PR에 리뷰 코멘트 추가
+          subprocess.run([
+              'gh', 'pr', 'comment', str(pr_data['number']),
+              '--body-file', 'review.md'
+          ])
+          EOF
 
       - name: Create Review Comment
         uses: actions/github-script@v6

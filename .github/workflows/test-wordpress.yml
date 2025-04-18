@@ -1,0 +1,53 @@
+name: Test WordPress
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'wordpress/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'wordpress/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, mysqlnd
+        coverage: xdebug
+
+    - name: Install dependencies
+      run: |
+        cd wordpress
+        composer install --prefer-dist --no-progress
+
+    - name: Run linting
+      run: |
+        cd wordpress
+        composer run lint
+        composer run cs
+
+    - name: Run tests
+      run: |
+        cd wordpress
+        composer run test
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./wordpress/coverage/clover.xml
+        flags: wordpress
+        name: codecov-wordpress
+        fail_ci_if_error: true 
